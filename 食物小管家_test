@@ -1,1 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能詳情 - 食品日期管理</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#fafbfa',
+            fg: '#1a1a1a',
+            muted: '#6b7280',
+            accent: '#2d9a6b',
+            'accent-light': '#e8f5ef',
+            'accent-dark': '#1e7a52',
+            card: '#ffffff',
+            border: '#e5e7eb',
+            subtle: '#f3f4f6'
+          },
+          fontFamily: {
+            display: ['Playfair Display', 'serif'],
+            body: ['Noto Sans TC', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #fafbfa;
+      --fg: #1a1a1a;
+      --muted: #6b7280;
+      --accent: #2d9a6b;
+      --accent-light: #e8f5ef;
+      --accent-dark: #1e7a52;
+      --card: #ffffff;
+      --border: #e5e7eb;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      overflow-x: hidden;
+    }
+    .bg-pattern {
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(45, 154, 107, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(45, 154, 107, 0.05) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
 
+    /* Reveal */
+    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+
+    /* Buttons & Nav */
+    .btn-primary { position: relative; overflow: hidden; transition: all 0.3s ease; }
+    .btn-primary::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s ease; }
+    .btn-primary:hover::before { left: 100%; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -6px rgba(45, 154, 107, 0.4); }
+    .nav-link { position: relative; }
+    .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: var(--accent); transition: width 0.3s ease; }
+    .nav-link:hover::after { width: 100%; }
+
+    /* Mobile Menu */
+    .mobile-menu { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .mobile-menu.open { transform: translateX(0); }
+
+    /* Tabs & Accordion */
+    .tab-btn { transition: all 0.3s ease; }
+    .tab-btn.active { color: var(--accent); border-color: var(--accent); background-color: var(--accent-light); }
+    .tab-content { display: none; animation: fadeIn 0.5s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Quiz */
+    .quiz-option { transition: all 0.3s ease; cursor: pointer; }
+    .quiz-option:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .quiz-option.correct { border-color: #22c55e; background-color: #f0fdf4; color: #166534; pointer-events: none; }
+    .quiz-option.incorrect { border-color: #ef4444; background-color: #fef2f2; color: #991b1b; pointer-events: none; }
+
+    /* Modal */
+    .modal { opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s ease; }
+    .modal.show { opacity: 1; visibility: visible; }
+    .modal-content { transform: scale(0.9) translateY(20px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .modal.show .modal-content { transform: scale(1) translateY(0); }
+
+    /* Focus & Accessibility */
+    *:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body class="bg-pattern min-h-screen">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-bg/80 backdrop-blur-md border-b border-border/50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20">
+        <a href="index.html" class="flex items-center gap-2 sm:gap-3 group">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 bg-accent rounded-lg flex items-center justify-center transition-transform group-hover:rotate-6">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <span class="font-bold text-base sm:text-lg text-fg">食品日期管理</span>
+        </a>
+        <div class="hidden md:flex items-center gap-8">
+          <a href="index.html" class="nav-link text-muted hover:text-fg transition-colors">首頁</a>
+          <a href="#features-detail" class="nav-link text-muted hover:text-fg transition-colors">功能詳情</a>
+          <a href="#quiz" class="nav-link text-muted hover:text-fg transition-colors">趣味測驗</a>
+          <a href="#report" class="nav-link text-muted hover:text-fg transition-colors">問題通報</a>
+          <a href="index.html#form" class="btn-primary bg-accent text-white px-5 py-2.5 rounded-lg font-medium hover:bg-accent-dark">開始使用</a>
+        </div>
+        <button id="menuBtn" class="md:hidden p-2 rounded-lg hover:bg-subtle transition-colors" aria-label="開啟選單">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="mobileMenu" class="mobile-menu fixed top-16 right-0 bottom-0 w-72 bg-card border-l border-border shadow-xl md:hidden">
+      <div class="p-6 flex flex-col gap-4">
+        <a href="index.html" class="text-muted hover:text-fg py-3 px-4 rounded-lg hover:bg-subtle transition-colors">回首頁</a>
+        <a href="#features-detail" class="text-muted hover:text-fg py-3 px-4 rounded-lg hover:bg-subtle transition-colors">功能詳情</a>
+        <a href="#quiz" class="text-muted hover:text-fg py-3 px-4 rounded-lg hover:bg-subtle transition-colors">趣味測驗</a>
+        <a href="#report" class="text-muted hover:text-fg py-3 px-4 rounded-lg hover:bg-subtle transition-colors">問題通報</a>
+        <hr class="border-border my-2">
+        <a href="index.html#form" class="btn-primary bg-accent text-white px-5 py-3 rounded-lg font-medium text-center hover:bg-accent-dark">開始使用</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="pt-32 pb-16 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto text-center">
+      <div class="reveal inline-block bg-accent-light text-accent px-4 py-1.5 rounded-full text-sm font-medium mb-6">功能總覽</div>
+      <h1 class="reveal reveal-delay-1 text-4xl sm:text-5xl font-bold text-fg mb-6">深入探索每一項功能</h1>
+      <p class="reveal reveal-delay-2 text-lg text-muted max-w-2xl mx-auto">
+        不只是記錄，更智能的管理夥伴。點擊下方標籤，了解我們如何幫您守護食物新鮮度。
+      </p>
+    </div>
+  </section>
+
+  <!-- Feature Detail Tabs Section -->
+  <section id="features-detail" class="py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto reveal">
+      <!-- Tabs Navigation -->
+      <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
+        <button class="tab-btn active px-6 py-3 rounded-xl border border-border font-medium text-sm sm:text-base focus:outline-none" data-tab="tracking">智能追蹤</button>
+        <button class="tab-btn px-6 py-3 rounded-xl border border-border font-medium text-sm sm:text-base text-muted focus:outline-none" data-tab="tags">自動標籤</button>
+        <button class="tab-btn px-6 py-3 rounded-xl border border-border font-medium text-sm sm:text-base text-muted focus:outline-none" data-tab="alerts">提醒通知</button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
+        <!-- Tracking Content -->
+        <div id="tracking" class="tab-content active">
+          <div class="grid md:grid-cols-2 gap-8 p-6 sm:p-10 items-center">
+            <div>
+              <span class="text-xs font-bold text-accent uppercase tracking-wider">核心功能</span>
+              <h3 class="text-2xl sm:text-3xl font-bold text-fg mt-2 mb-4">智能保質期追蹤</h3>
+              <p class="text-muted mb-6 leading-relaxed">
+                不再需要大腦記憶！我們的系統會根據您輸入的購買日期與有效期限，自動計算剩餘天數，並以直觀的紅綠燈系統（過期/注意/新鮮）呈現，讓您打開冰箱前就能一覽無遺。
+              </p>
+              <ul class="space-y-3 text-fg">
+                <li class="flex items-start gap-3">
+                  <div class="w-5 h-5 rounded-full bg-accent-light flex items-center justify-center mt-0.5 flex-shrink-0">
+                    <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <span>自動計算剩餘天數</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-5 h-5 rounded-full bg-accent-light flex items-center justify-center mt-0.5 flex-shrink-0">
+                    <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <span>視覺化狀態提醒</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-5 h-5 rounded-full bg-accent-light flex items-center justify-center mt-0.5 flex-shrink-0">
+                    <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <span>支援批量匯入與匯出</span>
+                </li>
+              </ul>
+            </div>
+            <div class="bg-subtle rounded-2xl p-6 flex justify-center items-center">
+              <!-- Simulated UI Element -->
+              <div class="w-full max-w-xs bg-white rounded-xl shadow-lg p-4 border border-border">
+                <div class="flex justify-between items-center mb-4">
+                  <span class="font-bold text-fg">冰箱狀態</span>
+                  <span class="text-xs text-accent bg-accent-light px-2 py-0.5 rounded-full">即時更新</span>
+                </div>
+                <div class="space-y-3">
+                  <div class="h-4 bg-red-100 rounded w-3/4 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 bottom-0 w-2 bg-red-500"></div>
+                  </div>
+                  <div class="h-4 bg-yellow-100 rounded w-1/2 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 bottom-0 w-2 bg-yellow-500"></div>
+                  </div>
+                  <div class="h-4 bg-green-100 rounded w-full relative overflow-hidden">
+                    <div class="absolute right-0 top-0 bottom-0 w-2 bg-green-500"></div>
+                  </div>
+                </div>
+                <div class="mt-4 text-xs text-muted text-right">下次過期：3天後</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tags Content -->
+        <div id="tags" class="tab-content">
+          <div class="grid md:grid-cols-2 gap-8 p-6 sm:p-10 items-center">
+            <div class="md:order-2">
+              <span class="text-xs font-bold text-accent uppercase tracking-wider">智能分類</span>
+              <h3 class="text-2xl sm:text-3xl font-bold text-fg mt-2 mb-4">自動標籤生成</h3>
+              <p class="text-muted mb-6 leading-relaxed">
+                告別手動分類的繁瑣。系統內建豐富的食物資料庫，當您輸入「鮮奶」，系統自動標記為「乳製品」並建議保存期限範圍。您也可以自定義標籤顏色與名稱。
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm border border-blue-100">乳製品</span>
+                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-sm border border-red-100">肉類</span>
+                <span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm border border-green-100">蔬菜</span>
+                <span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm border border-purple-100">飲料</span>
+              </div>
+            </div>
+            <div class="md:order-1 bg-subtle rounded-2xl p-6 flex justify-center items-center">
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-border text-center">
+                  <div class="w-10 h-10 mx-auto bg-blue-100 rounded-lg mb-2 flex items-center justify-center text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                  </div>
+                  <span class="text-sm font-medium text-fg">乳製品</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-border text-center">
+                  <div class="w-10 h-10 mx-auto bg-red-100 rounded-lg mb-2 flex items-center justify-center text-red-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c-1.5 0-3 1.5-3 3v6c0 1.5 1.5 3 3 3s3-1.5 3-3V6c0-1.5-1.5-3-3-3z"/></svg>
+                  </div>
+                  <span class="text-sm font-medium text-fg">肉類</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-border text-center">
+                  <div class="w-10 h-10 mx-auto bg-green-100 rounded-lg mb-2 flex items-center justify-center text-green-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-3 0-5 2-5 5s2 5 5 5 5-2 5-5-2-5-5-5z"/></svg>
+                  </div>
+                  <span class="text-sm font-medium text-fg">蔬菜</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-border text-center">
+                  <div class="w-10 h-10 mx-auto bg-purple-100 rounded-lg mb-2 flex items-center justify-center text-purple-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 4h12l-1 17H7L6 4z"/></svg>
+                  </div>
+                  <span class="text-sm font-medium text-fg">飲料</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerts Content -->
+        <div id="alerts" class="tab-content">
+          <div class="grid md:grid-cols-2 gap-8 p-6 sm:p-10 items-center">
+            <div>
+              <span class="text-xs font-bold text-accent uppercase tracking-wider">即時提醒</span>
+              <h3 class="text-2xl sm:text-3xl font-bold text-fg mt-2 mb-4">多管道通知服務</h3>
+              <p class="text-muted mb-6 leading-relaxed">
+                不再錯過任何食物的最佳賞味期。我們支援網頁推播、Email 通知，甚至可串接 LINE Bot（開發中）。設定您喜歡的提醒時間，在食物過期前 3 天、1 天收到提醒。
+              </p>
+              <div class="bg-subtle p-4 rounded-xl border border-border">
+                <div class="flex items-center gap-3 mb-2">
+                  <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                  <span class="font-medium text-fg">推播通知已開啟</span>
+                </div>
+                <p class="text-xs text-muted">將在每天早上 9:00 掃描即將過期的食物並發送通知。</p>
+              </div>
+            </div>
+            <div class="bg-subtle rounded-2xl p-6 flex justify-center items-center">
+              <div class="w-full max-w-xs space-y-4">
+                <div class="bg-white p-3 rounded-xl shadow-sm border border-border flex items-start gap-3 relative">
+                  <button class="absolute top-2 right-2 text-gray-300 hover:text-gray-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                  <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  </div>
+                  <div>
+                    <div class="font-medium text-sm text-fg">賞味期限倒數</div>
+                    <div class="text-xs text-muted">您的「優格」將在 3 天後過期。</div>
+                  </div>
+                </div>
+                <div class="bg-white p-3 rounded-xl shadow-sm border border-border flex items-start gap-3 relative opacity-60">
+                  <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                  </div>
+                  <div>
+                    <div class="font-medium text-sm text-fg">過期警告</div>
+                    <div class="text-xs text-muted">您的「鮮奶」已過期！</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Simple Quiz Section -->
+  <section id="quiz" class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-bg to-accent-light/30">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-12 reveal">
+        <span class="inline-block text-accent font-medium text-sm tracking-wider uppercase mb-4">小知識測驗</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-fg mb-4">你了解食物保存嗎？</h2>
+        <p class="text-muted">測試一下你的食物管理知識，答對有驚喜喔！</p>
+      </div>
+
+      <div class="reveal reveal-delay-1 bg-card rounded-3xl border border-border shadow-lg p-6 sm:p-10">
+        <div id="quiz-container">
+          <!-- Question 1 -->
+          <div class="quiz-step" data-step="1">
+            <div class="mb-6">
+              <span class="text-xs font-bold text-accent uppercase">問題 1 / 3</span>
+              <h3 class="text-xl font-bold text-fg mt-2">鮮奶開封後，最佳保存期限為多久？</h3>
+            </div>
+            <div class="space-y-3">
+              <div class="quiz-option p-4 rounded-xl border-2 border-border hover:border-accent" data-correct="false">
+                <span class="font-medium">A. 7-10 天</span>
+              </div>
+              <div class="quiz-option p-4 rounded-xl border-2 border-border hover:border-accent" data-correct="true">
+                <span class="font-medium">B. 2-3 天</span>
+              </div>
+              <div class="quiz-option p-4 rounded-xl border-2 border-border hover:border-accent" data-correct="false">
+                <span class="font-medium">C. 14 天</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Question 2 -->
+          <div class="quiz-step hidden" data-step="2">
+            <div class="mb-6">
+              <span class="text-xs font-bold text-accent uppercase">問題 2 / 3</span>
+              <h3 class="text-xl font-bold text-fg mt-2">雞蛋應該存放在冰箱的哪個位置最合適？</h3>
+            </div>
+            <div class="space-y-3">
+              <div class="quiz-option p-4 rounded-xl border-2 border-border hover:border-accent" data-correct="false">
+                <span class="font-medium">A. 冰箱門的蛋架</span>
+              </div>
+              <div class="quiz-option p-4 rounded-xl border-2 border-border hover:border-accent" data-correct="true">
+                <span class="font-medium">B. 冰箱內部隔層</span>
+              </div>
+              <div class="quiz-option p-4 rounded-xl border-2 border-border hover:border-accent" data-correct="false">
+                <span class="font-medium">C. 冷凍庫</span>
+              </div>
+            </div>
+            <p class="text-xs text-muted mt-3 opacity-0 transition-opacity duration-300" id="explanation-2">提示：冰箱門溫度變化大，容易造成雞蛋變質。</p>
+          </div>
+
+          <!-- Result -->
+          <div class="quiz-step hidden text-center py-8" data-step="result">
+            <div class="w-20 h-20 bg-accent-light rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-10 h-10 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-fg mb-2">太棒了！你是食物管理達人</h3>
+            <p class="text-muted mb-6">恭喜你完成測驗，看來你的冰箱一定很乾淨！</p>
+            <a href="index.html#form" class="btn-primary inline-flex items-center gap-2 bg-accent text-white px-6 py-3 rounded-xl font-medium">
+              立即開始管理
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Report Form Section -->
+  <section id="report" class="py-20 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl mx-auto">
+      <div class="text-center mb-12 reveal">
+        <span class="inline-block text-accent font-medium text-sm tracking-wider uppercase mb-4">意見回饋</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-fg mb-4">問題通報與建議</h2>
+        <p class="text-muted">發現系統問題或有新功能建議？請填寫下方表單通知我們。</p>
+      </div>
+
+      <form id="reportForm" class="reveal reveal-delay-1 bg-card rounded-3xl border border-border shadow-sm p-6 sm:p-10">
+        <div class="space-y-6">
+          <div>
+            <label for="reportType" class="block text-sm font-medium text-fg mb-2">問題類型</label>
+            <select id="reportType" name="reportType" class="w-full px-4 py-3 rounded-xl border border-border bg-white focus:outline-none focus:border-accent transition-colors">
+              <option value="bug">系統錯誤</option>
+              <option value="suggestion">功能建議</option>
+              <option value="data">資料問題</option>
+              <option value="other">其他</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="reportName" class="block text-sm font-medium text-fg mb-2">聯絡姓名</label>
+            <input type="text" id="reportName" name="reportName" placeholder="您的稱呼" class="w-full px-4 py-3 rounded-xl border border-border bg-white focus:outline-none focus:border-accent transition-colors">
+          </div>
+
+          <div>
+            <label for="reportDesc" class="block text-sm font-medium text-fg mb-2">問題描述 <span class="text-red-400">*</span></label>
+            <textarea id="reportDesc" name="reportDesc" rows="4" required placeholder="請詳細描述您遇到的問題或建議內容..." class="w-full px-4 py-3 rounded-xl border border-border bg-white focus:outline-none focus:border-accent transition-colors resize-none"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-fg mb-2">上傳截圖（選填）</label>
+            <div class="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-accent transition-colors cursor-pointer">
+              <svg class="w-8 h-8 mx-auto text-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <p class="text-sm text-muted">點擊或拖曳檔案至此處</p>
+              <p class="text-xs text-muted mt-1">支援 JPG, PNG 格式</p>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary w-full bg-accent text-white px-8 py-4 rounded-xl font-medium text-lg hover:bg-accent-dark mt-8 flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+          送出表單
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 px-4 sm:px-6 lg:px-8 border-t border-border bg-subtle/50">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <span class="font-bold text-fg">食品日期管理</span>
+        </div>
+        <nav class="flex items-center gap-6 text-sm text-muted">
+          <a href="index.html" class="hover:text-fg transition-colors">回首頁</a>
+          <a href="#features-detail" class="hover:text-fg transition-colors">功能詳情</a>
+          <a href="#report" class="hover:text-fg transition-colors">問題通報</a>
+        </nav>
+        <p class="text-sm text-muted">Made with care by Vincy & Charisa</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Success Modal -->
+  <div id="successModal" class="modal fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+    <div class="modal-content bg-card rounded-3xl p-8 sm:p-12 max-w-md w-full text-center relative overflow-hidden">
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h3 class="text-2xl font-bold text-fg mb-2">已成功送出</h3>
+      <p class="text-muted mb-6">感謝您的回報，我們會盡快處理！</p>
+      <button id="closeModalBtn" class="w-full px-6 py-3 rounded-xl bg-accent text-white font-medium hover:bg-accent-dark transition-colors">關閉</button>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Variables
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const reportForm = document.getElementById('reportForm');
+    const successModal = document.getElementById('successModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    
+    let isMenuOpen = false;
+
+    // Mobile Menu
+    menuBtn.addEventListener('click', () => {
+      isMenuOpen = !isMenuOpen;
+      mobileMenu.classList.toggle('open', isMenuOpen);
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => { isMenuOpen = false; mobileMenu.classList.remove('open'); });
+    });
+
+    // Scroll Reveal
+    function initScrollReveal() {
+      const revealElements = document.querySelectorAll('.reveal');
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      
+      if (prefersReducedMotion) { revealElements.forEach(el => el.classList.add('visible')); return; }
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+      }, { rootMargin: '0px 0px -80px 0px', threshold: 0.1 });
+
+      revealElements.forEach(el => observer.observe(el));
+    }
+
+    // Tabs Logic
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+
+        tabButtons.forEach(b => {
+          b.classList.remove('active');
+          b.classList.add('text-muted');
+        });
+        btn.classList.add('active');
+        btn.classList.remove('text-muted');
+
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+          if (content.id === target) content.classList.add('active');
+        });
+      });
+    });
+
+    // Quiz Logic
+    const quizSteps = document.querySelectorAll('.quiz-step');
+    const quizContainer = document.getElementById('quiz-container');
+    let currentStep = 0;
+
+    function handleQuizSelection(e) {
+      const option = e.target.closest('.quiz-option');
+      if (!option) return;
+
+      const isCorrect = option.dataset.correct === 'true';
+      const parentStep = option.closest('.quiz-step');
+      const options = parentStep.querySelectorAll('.quiz-option');
+
+      // Disable further clicks
+      options.forEach(opt => {
+        opt.style.pointerEvents = 'none';
+        if (opt.dataset.correct === 'true') {
+          opt.classList.add('correct');
+        } else if (opt === option && !isCorrect) {
+          opt.classList.add('incorrect');
+        }
+      });
+
+      // Show explanation if exists
+      const explanation = parentStep.querySelector('[id^="explanation"]');
+      if (explanation) explanation.classList.replace('opacity-0', 'opacity-100');
+
+      // Next step
+      setTimeout(() => {
+        parentStep.classList.add('hidden');
+        currentStep++;
+        if (currentStep < quizSteps.length) {
+          quizSteps[currentStep].classList.remove('hidden');
+        }
+      }, 1500);
+    }
+
+    quizContainer.addEventListener('click', handleQuizSelection);
+
+    // Form Submission
+    reportForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      successModal.classList.add('show');
+      reportForm.reset();
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      successModal.classList.remove('show');
+    });
+    
+    successModal.addEventListener('click', (e) => {
+        if (e.target === successModal) successModal.classList.remove('show');
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      initScrollReveal();
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768 && isMenuOpen) { isMenuOpen = false; mobileMenu.classList.remove('open'); }
+    });
+  </script>
+</body>
+</html>
