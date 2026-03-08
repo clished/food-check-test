@@ -57,13 +57,11 @@
       background-attachment: fixed;
     }
 
-    /* Reveal */
     .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
     .reveal.visible { opacity: 1; transform: translateY(0); }
     .reveal-delay-1 { transition-delay: 0.1s; }
     .reveal-delay-2 { transition-delay: 0.2s; }
 
-    /* Buttons & Nav */
     .btn-primary { position: relative; overflow: hidden; transition: all 0.3s ease; }
     .btn-primary::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s ease; }
     .btn-primary:hover::before { left: 100%; }
@@ -72,39 +70,26 @@
     .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: var(--accent); transition: width 0.3s ease; }
     .nav-link:hover::after { width: 100%; }
 
-    /* Mobile Menu */
     .mobile-menu { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     .mobile-menu.open { transform: translateX(0); }
 
-    /* Tabs & Accordion */
     .tab-btn { transition: all 0.3s ease; }
     .tab-btn.active { color: var(--accent); border-color: var(--accent); background-color: var(--accent-light); }
     .tab-content { display: none; animation: fadeIn 0.5s ease; }
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Quiz */
     .quiz-option { transition: all 0.3s ease; cursor: pointer; }
     .quiz-option:hover { border-color: var(--accent); transform: translateY(-2px); }
     .quiz-option.correct { border-color: #22c55e; background-color: #f0fdf4; color: #166534; pointer-events: none; }
     .quiz-option.incorrect { border-color: #ef4444; background-color: #fef2f2; color: #991b1b; pointer-events: none; }
 
-    /* Modal */
     .modal { opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s ease; }
     .modal.show { opacity: 1; visibility: visible; }
     .modal-content { transform: scale(0.9) translateY(20px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     .modal.show .modal-content { transform: scale(1) translateY(0); }
 
-    /* Focus & Accessibility */
     *:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    /* Responsive improvements */
-    @media (max-width: 380px) {
-      .mobile-menu {
-        width: 100%;
-        max-width: 300px;
-      }
-    }
-    
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
       .reveal { opacity: 1; transform: none; }
@@ -113,13 +98,12 @@
 </head>
 <body class="bg-pattern min-h-screen">
 
-  <!-- Navigation -->
   <nav class="fixed top-0 left-0 right-0 z-50 bg-bg/80 backdrop-blur-md border-b border-border/50">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 sm:h-20">
         <a href="index.html" class="flex items-center gap-2 sm:gap-3 group">
           <div class="w-8 h-8 sm:w-10 sm:h-10 bg-accent rounded-lg flex items-center justify-center transition-transform group-hover:rotate-6">
-            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="食品日期管理標誌">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
           </div>
@@ -133,7 +117,7 @@
           <a href="index.html#form" class="btn-primary bg-accent text-white px-5 py-2.5 rounded-lg font-medium hover:bg-accent-dark">開始使用</a>
         </div>
         <button id="menuBtn" class="md:hidden p-2 rounded-lg hover:bg-subtle transition-colors" aria-label="開啟選單">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
       </div>
     </div>
@@ -163,16 +147,13 @@
   <!-- Feature Detail Tabs Section -->
   <section id="features-detail" class="py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-5xl mx-auto reveal">
-      <!-- Tabs Navigation -->
       <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
         <button class="tab-btn active px-6 py-3 rounded-xl border border-border font-medium text-sm sm:text-base focus:outline-none" data-tab="tracking">智能追蹤</button>
         <button class="tab-btn px-6 py-3 rounded-xl border border-border font-medium text-sm sm:text-base text-muted focus:outline-none" data-tab="tags">自動標籤</button>
         <button class="tab-btn px-6 py-3 rounded-xl border border-border font-medium text-sm sm:text-base text-muted focus:outline-none" data-tab="alerts">提醒通知</button>
       </div>
 
-      <!-- Tab Content -->
       <div class="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
-        <!-- Tracking Content -->
         <div id="tracking" class="tab-content active">
           <div class="grid md:grid-cols-2 gap-8 p-6 sm:p-10 items-center">
             <div>
@@ -203,7 +184,6 @@
               </ul>
             </div>
             <div class="bg-subtle rounded-2xl p-6 flex justify-center items-center">
-              <!-- Simulated UI Element -->
               <div class="w-full max-w-xs bg-white rounded-xl shadow-lg p-4 border border-border">
                 <div class="flex justify-between items-center mb-4">
                   <span class="font-bold text-fg">冰箱狀態</span>
@@ -226,7 +206,6 @@
           </div>
         </div>
 
-        <!-- Tags Content -->
         <div id="tags" class="tab-content">
           <div class="grid md:grid-cols-2 gap-8 p-6 sm:p-10 items-center">
             <div class="md:order-2">
@@ -246,25 +225,25 @@
               <div class="grid grid-cols-2 gap-4">
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-border text-center">
                   <div class="w-10 h-10 mx-auto bg-blue-100 rounded-lg mb-2 flex items-center justify-center text-blue-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                   </div>
                   <span class="text-sm font-medium text-fg">乳製品</span>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-border text-center">
                   <div class="w-10 h-10 mx-auto bg-red-100 rounded-lg mb-2 flex items-center justify-center text-red-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c-1.5 0-3 1.5-3 3v6c0 1.5 1.5 3 3 3s3-1.5 3-3V6c0-1.5-1.5-3-3-3z"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c-1.5 0-3 1.5-3 3v6c0 1.5 1.5 3 3 3s3-1.5 3-3V6c0-1.5-1.5-3-3-3z"/></svg>
                   </div>
                   <span class="text-sm font-medium text-fg">肉類</span>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-border text-center">
                   <div class="w-10 h-10 mx-auto bg-green-100 rounded-lg mb-2 flex items-center justify-center text-green-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-3 0-5 2-5 5s2 5 5 5 5-2 5-5-2-5-5-5z"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-3 0-5 2-5 5s2 5 5 5 5-2 5-5-2-5-5-5z"/></svg>
                   </div>
                   <span class="text-sm font-medium text-fg">蔬菜</span>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-border text-center">
                   <div class="w-10 h-10 mx-auto bg-purple-100 rounded-lg mb-2 flex items-center justify-center text-purple-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 4h12l-1 17H7L6 4z"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 4h12l-1 17H7L6 4z"/></svg>
                   </div>
                   <span class="text-sm font-medium text-fg">飲料</span>
                 </div>
@@ -273,7 +252,6 @@
           </div>
         </div>
 
-        <!-- Alerts Content -->
         <div id="alerts" class="tab-content">
           <div class="grid md:grid-cols-2 gap-8 p-6 sm:p-10 items-center">
             <div>
@@ -332,7 +310,6 @@
 
       <div class="reveal reveal-delay-1 bg-card rounded-3xl border border-border shadow-lg p-6 sm:p-10">
         <div id="quiz-container">
-          <!-- Question 1 -->
           <div class="quiz-step" data-step="1">
             <div class="mb-6">
               <span class="text-xs font-bold text-accent uppercase">問題 1 / 3</span>
@@ -351,7 +328,6 @@
             </div>
           </div>
 
-          <!-- Question 2 -->
           <div class="quiz-step hidden" data-step="2">
             <div class="mb-6">
               <span class="text-xs font-bold text-accent uppercase">問題 2 / 3</span>
@@ -371,27 +347,6 @@
             <p class="text-xs text-muted mt-3 opacity-0 transition-opacity duration-300" id="explanation-2">提示：冰箱門溫度變化大，容易造成雞蛋變質。</p>
           </div>
 
-          <!-- Question 3 -->
-          <div class="quiz-step hidden" data-step="3">
-            <div class="mb-6">
-              <span class="text-xs font-bold text-accent uppercase">問題 3 / 3</span>
-              <h3 class="text-xl font-bold text-fg mt-2">以下哪種食物不適合放在冰箱冷藏？</h3>
-            </div>
-            <div class="space-y-3">
-              <div class="quiz-option p-4 rounded-xl border-2 border-border hover:border-accent" data-correct="false">
-                <span class="font-medium">A. 番茄</span>
-              </div>
-              <div class="quiz-option p-4 rounded-xl border-2 border-border hover:border-accent" data-correct="true">
-                <span class="font-medium">B. 香蕉</span>
-              </div>
-              <div class="quiz-option p-4 rounded-xl border-2 border-border hover:border-accent" data-correct="false">
-                <span class="font-medium">C. 牛奶</span>
-              </div>
-            </div>
-            <p class="text-xs text-muted mt-3 opacity-0 transition-opacity duration-300" id="explanation-3">提示：香蕉在低溫下容易變黑，影響口感和外觀。</p>
-          </div>
-
-          <!-- Result -->
           <div class="quiz-step hidden text-center py-8" data-step="result">
             <div class="w-20 h-20 bg-accent-light rounded-full flex items-center justify-center mx-auto mb-4">
               <svg class="w-10 h-10 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -490,7 +445,6 @@
   </div>
 
   <script>
-    // Initialize Variables
     const menuBtn = document.getElementById('menuBtn');
     const mobileMenu = document.getElementById('mobileMenu');
     const reportForm = document.getElementById('reportForm');
@@ -499,7 +453,6 @@
     
     let isMenuOpen = false;
 
-    // Mobile Menu
     menuBtn.addEventListener('click', () => {
       isMenuOpen = !isMenuOpen;
       mobileMenu.classList.toggle('open', isMenuOpen);
@@ -509,7 +462,6 @@
       link.addEventListener('click', () => { isMenuOpen = false; mobileMenu.classList.remove('open'); });
     });
 
-    // Scroll Reveal
     function initScrollReveal() {
       const revealElements = document.querySelectorAll('.reveal');
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -523,7 +475,6 @@
       revealElements.forEach(el => observer.observe(el));
     }
 
-    // Tabs Logic
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -545,7 +496,6 @@
       });
     });
 
-    // Quiz Logic
     const quizSteps = document.querySelectorAll('.quiz-step');
     const quizContainer = document.getElementById('quiz-container');
     let currentStep = 0;
@@ -558,7 +508,6 @@
       const parentStep = option.closest('.quiz-step');
       const options = parentStep.querySelectorAll('.quiz-option');
 
-      // Disable further clicks
       options.forEach(opt => {
         opt.style.pointerEvents = 'none';
         if (opt.dataset.correct === 'true') {
@@ -568,11 +517,9 @@
         }
       });
 
-      // Show explanation if exists
       const explanation = parentStep.querySelector('[id^="explanation"]');
       if (explanation) explanation.classList.replace('opacity-0', 'opacity-100');
 
-      // Next step
       setTimeout(() => {
         parentStep.classList.add('hidden');
         currentStep++;
@@ -584,7 +531,6 @@
 
     quizContainer.addEventListener('click', handleQuizSelection);
 
-    // Form Submission
     reportForm.addEventListener('submit', (e) => {
       e.preventDefault();
       successModal.classList.add('show');
@@ -599,7 +545,6 @@
         if (e.target === successModal) successModal.classList.remove('show');
     });
 
-    // Initialize
     document.addEventListener('DOMContentLoaded', () => {
       initScrollReveal();
     });
